@@ -1,0 +1,14 @@
+﻿<Window 
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="RevitByEric.MainWindow"
+      Title="C# Playpen: https://twitter.com/joshnewzealand" Height="150" Width="400"  MinHeight="200" MinWidth="400" Topmost="True" Closing="Window_Closing"  ResizeMode="NoResize">
+    <Grid Margin="0,-3,0,3" >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Button x:Name="my0506LoadingFamilies" Content="5 of 19                  6 of 19&#xA;&#xA; • Loading families&#xA; • Place specific family&#xD;&#xA;&#xA;&#xA;" HorizontalAlignment="Left" Margin="100,26,0,0" VerticalAlignment="Top" Width="193" Height="111" Click="my0506LoadingFamilies_Click" />
+        <Button x:Name="myButton_EE05_LoadAllFamilies" Content="↑ Code Brief ↑" HorizontalAlignment="Left" Margin="100,142,0,0" VerticalAlignment="Top" Width="94" Click="myButton_EE05_LoadAllFamilies_Click"  />
+        <Button x:Name="myButton_EE06_PlaceAFamily_OnDoubleClick" Content="↑ Code Brief ↑" HorizontalAlignment="Left" Margin="200,142,0,0" VerticalAlignment="Top" Width="94" Click="myButton_EE06_PlaceAFamily_OnDoubleClick_Click" />
+    </Grid>
+</Window>

@@ -1,0 +1,19 @@
+﻿                ///                TECHNIQUE 5 OF 19 (EE05_LoadAllFamilies.cs)
+                ///↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ LOADING ALL THE FAMILIES FROM A LISTVIEW ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+                ///
+                /// Interfaces and ENUM's:
+                ///     IFamilyLoadOptions
+                /// 
+                /// Introduces classes:
+                ///     Families_ThatMustBeLoaded (custom static class)
+                ///     
+                /// 
+                /// Key methods:
+                ///     doc.LoadFamily(
+                ///
+                /// 
+                /// * class is part of C# playpen (not Revit API)
+		///	
+		///	
+		///	
+		///	https://github.com/joshnewzealand/Revit-API-Playpen-CSharp

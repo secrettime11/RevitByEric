@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="Revit_v2018.DockableUI.UI_FamilySymbolLoadAndPlace"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Revit_v2018.DockableUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="300" Background="White" Loaded="UserControl_Loaded">
+    <Grid>
+        <ListView x:Name="myListView" Margin="10,35,10,87">
+            <ListView.View>
+                <GridView>
+                    <GridView.Columns>
+                        <GridViewColumn DisplayMemberBinding="{Binding String_Name}" Header="File Name" Width="280" />
+                    </GridView.Columns>
+                </GridView>
+            </ListView.View>
+
+            <ListView.Resources>
+                <Style TargetType="{x:Type GridViewColumnHeader}">
+                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                </Style>
+            </ListView.Resources>
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <EventSetter Event="PreviewMouseDoubleClick" Handler="ListViewItem_PreviewMouseDoubleClick"/>
+                    <Setter Property="VerticalContentAlignment" Value="Top"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+
+        </ListView>
+        <Button x:Name="myButton_LoadAllFamilies" Content="Load all families into the&#xD;&#xA;model (takes 10 seconds)" Margin="28,388,30,0"  Height="41" VerticalAlignment="Top" Click="myButton_LoadAllFamilies_Click"/>
+        <Label Content="DOUBLE CLICK to place a family" HorizontalAlignment="Left" Margin="10,4,0,0" VerticalAlignment="Top" Width="238"/>
+
+    </Grid>
+</UserControl>

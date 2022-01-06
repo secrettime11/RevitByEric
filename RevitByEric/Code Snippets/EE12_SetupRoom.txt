@@ -1,0 +1,17 @@
+﻿                            ///                      TECHNIQUE 12 OF 19 (EE12_SetupRoom.cs)
+                            ///↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ ARRANGE FURNITURE IN A ROOM WITH GLASS WALLS ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+                            ///
+                            /// Interfaces and ENUM's:
+                            ///     IFamilyLoadOptions
+                            /// 
+                            /// Introduces classes:
+                            ///     DataStorage
+                            /// 
+                            /// 
+                            /// Key methods:
+                            ///     DataStorage.Create(
+                            ///     
+                            /// 
+                            ///
+                            ///
+			    ///	https://github.com/joshnewzealand/Revit-API-Playpen-CSharp

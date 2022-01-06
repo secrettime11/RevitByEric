@@ -1,0 +1,34 @@
+﻿                ///            TECHNIQUE 13 OF 19 (EE13_ExtensibleStorage_NewOrSave.cs)
+                ///↓↓↓↓↓↓↓↓↓↓↓↓↓ SET SCHEMA DATA STRUCTURES (ENTITIES) TO THE ELEMENTS ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+                ///
+                /// Interfaces and ENUM's:
+                ///     
+                /// 
+                /// Introduces classes:
+                ///     KeyValuePair*
+                ///     DataStorage
+                ///     Schema
+                ///     Entity
+                ///     IDictionary*
+                ///     DisplayUnitType
+                /// 
+                /// 
+                /// Key methods:
+                ///     ((FamilyInstance)myEle).GetTransform().BasisX.AngleOnPlaneTo(XYZ.BasisY, XYZ.BasisZ);
+                ///
+                ///     ent_Parent = myDatastorage.GetEntity(schema_FurnLocations_Index);
+                ///     dict_Parent = ent_Parent.Get<IDictionary<string, Entity>>(
+                ///     dict_Parent.Add(
+                ///     ent_Parent.Set(dict_Parent
+                ///
+                ///     myDatastorage.SetEntity(ent_Parent);  //this is key
+                ///
+                ///
+                /// * class is actually part of the .NET framework (not Revit API)
+                /// 
+                /// Schema allows data to be structured more like database tables, (lists within lists)
+                /// Entity can exist in standalone DataStorage OR any other element.
+                /// Unwrap to use and wrap up again to store...like a Christmas present
+                ///
+                ///
+		///	https://github.com/joshnewzealand/Revit-API-Playpen-CSharp

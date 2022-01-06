@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="Revit_v2018.DockableUI.UI_SymbolDisplayAndPlacement"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Revit_v2018.DockableUI" xmlns:defined="clr-namespace:Revit_v2018.Defined" d:DataContext="{d:DesignInstance Type=defined:UserMember}"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="380" Background="White" Loaded="UserControl_Loaded">
+
+    <Grid Name="grid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.5*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="0.2*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <ListView Name="lv_category" ItemsSource="{Binding CList,Mode=TwoWay}" Margin="2,2,2,2" SelectionChanged="lv_category_SelectionChanged">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Name="stackPanel2" Orientation="Horizontal">
+                        <TextBlock  Text="{Binding Name,Mode=TwoWay}" Margin="5"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Button x:Name="btn_setting" Content="設置" Grid.Column="1" Height="30" VerticalAlignment="Top" Margin="0,2,2,2" Click="btn_setting_Click"/>
+        <Button x:Name="btn_userSetting" Content="載入自訂" Grid.Column="1" Height="30" VerticalAlignment="Top" Margin="0,35,2,0" Click="btn_userSetting_Click"/>
+        <Button x:Name="btn_loadAll" Content="載入全部" Grid.Column="1" Height="30" VerticalAlignment="Top" Margin="0,69,2,0" Click="btn_loadAll_Click"/>
+        <ListBox Name="lstFileManager" Background ="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" d:ItemsSource="{d:SampleData ItemCount=3}" Grid.Row="1" Grid.ColumnSpan="2" Margin="2,2,2,2">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="0,0,0,0" Width="165" Height="135">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" ></RowDefinition>
+                            <RowDefinition Height="Auto" ></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" ></ColumnDefinition>
+                            <ColumnDefinition Width="Auto" ></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Image Source="{Binding Img_}" HorizontalAlignment="Center" VerticalAlignment="Center" Height="60" Width="60" Grid.Row="0" Grid.Column="0"/>
+                        <TextBlock Text="{Binding Family_}" TextWrapping="WrapWithOverflow" Grid.Row="0" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Height="60" Width="100" Margin="2,2,2,2"/>
+                        <ListView ItemsSource="{Binding Symbol_Name}" SelectedItem="{Binding Name_}" Width="160" Height="65" Grid.Row="1" Grid.RowSpan="2" Margin="0,2,2,2" Grid.ColumnSpan="2" MouseUp="ListView_MouseUp">
+
+                        </ListView>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>
