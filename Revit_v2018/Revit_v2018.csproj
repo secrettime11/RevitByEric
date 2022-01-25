@@ -81,9 +81,6 @@
     <Compile Include="Defined\ini.cs" />
     <Compile Include="Defined\ListBoxExtention.cs" />
     <Compile Include="Defined\UserMember.cs" />
-    <Compile Include="DockableUI\UI_FamilySymbolLoadAndPlace.xaml.cs">
-      <DependentUpon>UI_FamilySymbolLoadAndPlace.xaml</DependentUpon>
-    </Compile>
     <Compile Include="DockableUI\UI_SymbolDisplayAndPlacement.xaml.cs">
       <DependentUpon>UI_SymbolDisplayAndPlacement.xaml</DependentUpon>
     </Compile>
@@ -97,7 +94,6 @@
       <DependentUpon>SymbolPlacement_SettingForm.cs</DependentUpon>
     </Compile>
     <Compile Include="HandlerEvent\Event_GetFamilySymbol.cs" />
-    <Compile Include="HandlerEvent\Event_LoadFamilySymbol.cs" />
     <Compile Include="HandlerEvent\Event_PlaceFamilySymbol.cs" />
     <Compile Include="HandlerEvent\Event_PreviewImage.cs" />
     <Compile Include="HandlerEvent\Event_SelectionGroup.cs" />
@@ -108,12 +104,10 @@
     <Compile Include="tets\ViewModel.cs" />
     <Compile Include="ViewModel\VM_Category.cs" />
     <Compile Include="ViewModel\VM_CList.cs" />
+    <Compile Include="ViewModel\VM_SymbolData.cs" />
+    <Compile Include="ViewModel\VM_SymbolList.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="DockableUI\UI_FamilySymbolLoadAndPlace.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="DockableUI\UI_SymbolDisplayAndPlacement.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -24,14 +24,13 @@ namespace Revit_v2018.DockableUI
     public partial class UI_SymbolDisplayAndPlacement : UserControl, IDockablePaneProvider
     {
         Function myFunction = new Function();
-        public Event_GetFamilySymbol Event_GetFamilySymbol { get; set; }
-        public ExternalEvent Event_GetFamilySymbol_ { get; set; }
-
         public Event_SymbolPlacement Event_SymbolPlacement { get; set; }
         public ExternalEvent Event_SymbolPlacement_ { get; set; }
 
-        public static VM_CList VM_CategoryList = new VM_CList();
         public ListView ListView_Category { get { return this.lv_category; } }
+
+        public static VM_CList VM_CategoryList = new VM_CList();
+        public static VM_SymbolList VM_SymbolList = new VM_SymbolList();
 
         public UI_SymbolDisplayAndPlacement()
         {
@@ -41,7 +40,7 @@ namespace Revit_v2018.DockableUI
             Event_SymbolPlacement_ = ExternalEvent.Create(Event_SymbolPlacement);
 
             this.lv_category.DataContext = VM_CategoryList;
-
+            this.lstFileManager.DataContext = VM_SymbolList;
         }
         public void SetupDockablePane(DockablePaneProviderData data)
         {
@@ -56,43 +55,41 @@ namespace Revit_v2018.DockableUI
         }
         private void lv_category_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ObservableCollection<LVData> LVDatas = new ObservableCollection<LVData>();
-            lstFileManager.ItemsSource = LVDatas;
-
             try
             {
                 var SelecttionInfo = lv_category.SelectedItem as VM_Category;
-                
-                // 取得族群下各自的Family
-                var data = (from o in Args.AllData
-                            where o.Category == SelecttionInfo.Name
-                            select o.Family).Distinct();
-
-                // Each Family
-                foreach (var item in data)
+                if (SelecttionInfo != null)
                 {
-                    // item under family
-                    var temp = Args.AllData.Where(x => x.Family == item).ToList();
-                    Dictionary<string, string> Symbol = new Dictionary<string, string>();
-                    BitmapImage Bitmap_image = null;
-                    bool GetImage = false;
-                    foreach (var stuff in temp)
-                    {
-                        // 只取一次Image
-                        if (!GetImage)
-                        {
-                            System.Drawing.Size imgSize = new System.Drawing.Size(50, 50);
-                            var img = stuff.FamilySymbol_.GetPreviewImage(imgSize);
-                            if (img != null)
-                            {
-                                Bitmap_image = myFunction.BitmapToImageSource(img);
-                                GetImage = true;
-                            }
-                        }
-                        Symbol.Add(stuff.Id, stuff.Symbol);
-                    }
+                    // 取得族群下各自的Family
+                    var data = (from o in Args.AllData
+                                where o.Category == SelecttionInfo.Name
+                                select o.Family).Distinct();
 
-                    LVDatas.Add(new LVData { Family_ = item, Symbol_ = Symbol, Img_ = Bitmap_image, Symbol_Name = Symbol.Values.ToList(), Name_ = "" });
+                    var displayData = new List<VM_SymbolData>();
+                    foreach (var item in data)
+                    {
+                        var temp = Args.AllData.Where(x => x.Family == item).ToList();
+                        Dictionary<string, string> Symbol = new Dictionary<string, string>();
+                        BitmapImage Bitmap_image = null;
+                        bool GetImage = false;
+                        foreach (var stuff in temp)
+                        {
+                            // 只取一次Image
+                            if (!GetImage)
+                            {
+                                System.Drawing.Size imgSize = new System.Drawing.Size(50, 50);
+                                var img = stuff.FamilySymbol_.GetPreviewImage(imgSize);
+                                if (img != null)
+                                {
+                                    Bitmap_image = myFunction.BitmapToImageSource(img);
+                                    GetImage = true;
+                                }
+                            }
+                            Symbol.Add(stuff.Id, stuff.Symbol);
+                        }
+                        displayData.Add(new VM_SymbolData { Family_ = item, Img_ = Bitmap_image, SymbolName_ = Symbol.Values.ToList(), Symbol_ = Symbol, Name_ = "" });
+                    }
+                    VM_SymbolList.SList = new ObservableCollection<VM_SymbolData>(displayData);
                 }
             }
             catch (Exception) { }
@@ -102,14 +99,16 @@ namespace Revit_v2018.DockableUI
             try
             {
                 var GetControl = myFunction.GetAncestorOfType<ListBoxItem>(sender as ListView);
-                var info = GetControl.Content as LVData;
+                var info = GetControl.DataContext as VM_SymbolData;
                 if (info != null)
                 {
                     Args.NowObj = info.Symbol_.FirstOrDefault(x => x.Value == info.Name_).Key;
                     Event_SymbolPlacement_.Raise();
                 }
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+            }
         }
         private void btn_setting_Click(object sender, RoutedEventArgs e)
         {
@@ -117,25 +116,6 @@ namespace Revit_v2018.DockableUI
 
             extendForm.ShowDialog();
         }
-
-        private void btn_userSetting_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btn_loadAll_Click(object sender, RoutedEventArgs e)
-        {
-            var displayData = new List<VM_Category>();
-
-            var Category = (from o in Args.AllData select o.Category).Distinct();
-
-            foreach (var item in Category)
-            {
-                displayData.Add(new VM_Category { Name = item });
-            }
-            VM_CategoryList.CList = new ObservableCollection<VM_Category>(displayData);
-        }
-
         public class LVData
         {
             public string Family_ { get; set; }
@@ -144,6 +124,5 @@ namespace Revit_v2018.DockableUI
             public Dictionary<string, string> Symbol_ { get; set; }
             public BitmapImage Img_ { get; set; }
         }
-
     }
 }

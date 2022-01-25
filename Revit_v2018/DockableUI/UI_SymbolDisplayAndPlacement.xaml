@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="380" Background="White" Loaded="UserControl_Loaded">
 
-    <Grid Name="grid">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="0.5*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
@@ -26,9 +26,8 @@
             </ListView.ItemTemplate>
         </ListView>
         <Button x:Name="btn_setting" Content="設置" Grid.Column="1" Height="30" VerticalAlignment="Top" Margin="0,2,2,2" Click="btn_setting_Click"/>
-        <Button x:Name="btn_userSetting" Content="載入自訂" Grid.Column="1" Height="30" VerticalAlignment="Top" Margin="0,35,2,0" Click="btn_userSetting_Click"/>
-        <Button x:Name="btn_loadAll" Content="載入全部" Grid.Column="1" Height="30" VerticalAlignment="Top" Margin="0,69,2,0" Click="btn_loadAll_Click"/>
-        <ListBox Name="lstFileManager" Background ="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" d:ItemsSource="{d:SampleData ItemCount=3}" Grid.Row="1" Grid.ColumnSpan="2" Margin="2,2,2,2">
+
+        <ListBox Name="lstFileManager" Background ="Transparent" ItemsSource="{Binding SList, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" Grid.Row="1" Grid.ColumnSpan="2" Margin="2,2,2,2">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel/>
@@ -45,11 +44,9 @@
                             <ColumnDefinition Width="Auto" ></ColumnDefinition>
                             <ColumnDefinition Width="Auto" ></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <Image Source="{Binding Img_}" HorizontalAlignment="Center" VerticalAlignment="Center" Height="60" Width="60" Grid.Row="0" Grid.Column="0"/>
-                        <TextBlock Text="{Binding Family_}" TextWrapping="WrapWithOverflow" Grid.Row="0" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Height="60" Width="100" Margin="2,2,2,2"/>
-                        <ListView ItemsSource="{Binding Symbol_Name}" SelectedItem="{Binding Name_}" Width="160" Height="65" Grid.Row="1" Grid.RowSpan="2" Margin="0,2,2,2" Grid.ColumnSpan="2" MouseUp="ListView_MouseUp">
-
-                        </ListView>
+                        <Image Source="{Binding Img_,Mode=TwoWay}" HorizontalAlignment="Center" VerticalAlignment="Center" Height="60" Width="60" Grid.Row="0" Grid.Column="0"/>
+                        <TextBlock Text="{Binding Family_,Mode=TwoWay}" TextWrapping="WrapWithOverflow" Grid.Row="0" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Height="60" Width="100" Margin="2,2,2,2"/>
+                        <ListView ItemsSource="{Binding SymbolName_,Mode=TwoWay}" SelectedItem="{Binding Name_}" Width="160" Height="65" Grid.Row="1" Grid.RowSpan="2" Margin="0,2,2,2" Grid.ColumnSpan="2" MouseUp="ListView_MouseUp"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

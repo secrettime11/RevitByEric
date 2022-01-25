@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -19,63 +20,14 @@ namespace Temp
         {
             InitializeComponent();
         }
-
+        List<string> data = new List<string>();
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
-            lv_category.Items.Add("DYS");
+            for (int i = 0; i < 10; i++)
+            {
+                data.Add($"你好 {i + 1}");
+                lstFileManager.Items.Add($"你好 {i + 1}");
+            }
         }
 
         private void lv_category_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -205,5 +157,31 @@ namespace Temp
             F_Setting f_Setting = new F_Setting();
             f_Setting.Show();
         }
+
+
+        private void txt_search_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string filter = this.txt_search.Text.Trim();
+            this.Display(filter);
+        }
+        private void Display(string filter)
+        {
+            this.lstFileManager.Items.Clear();
+
+            var result = data.Where(x => x.Contains(filter)).ToList();
+
+            foreach (var item in result)
+                lstFileManager.Items.Add(item);
+        }
+        private void btn_setting_Click(object sender, RoutedEventArgs e)
+        {
+            //F_Setting f_Setting = new F_Setting();
+            //f_Setting.Show();
+
+            Form1 f1 = new Form1();
+            f1.Show();
+        }
+
+        
     }
 }

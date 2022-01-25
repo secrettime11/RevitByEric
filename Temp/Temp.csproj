@@ -35,6 +35,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RevitAPI">
+      <HintPath>..\..\..\RevitAPI\Samples\Revit\RevitAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>..\..\..\RevitAPI\Samples\Revit\RevitAPIUI.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -61,6 +67,12 @@
     <Compile Include="DataFrame.xaml.cs">
       <DependentUpon>DataFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Function.cs" />
     <Compile Include="F_Setting.cs">
       <SubType>Form</SubType>
@@ -71,6 +83,7 @@
     <Compile Include="ini.cs" />
     <Compile Include="ListBoxExtension.cs" />
     <Compile Include="M_DataFrame.cs" />
+    <Compile Include="UICmd.cs" />
     <Compile Include="UserControl1.xaml.cs">
       <DependentUpon>UserControl1.xaml</DependentUpon>
     </Compile>
@@ -117,6 +130,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="F_Setting.resx">
       <DependentUpon>F_Setting.cs</DependentUpon>
     </EmbeddedResource>

@@ -26,6 +26,5 @@ namespace Revit_v2018.HandlerEvent
         {
             return "Event_SymbolPlacement";
         }
-
     }
 }

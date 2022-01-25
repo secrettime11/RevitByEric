@@ -23,14 +23,6 @@ namespace Revit_v2018
             string TabName = "Adjustice";
             string PanelName = "Families Template";
 
-            // 族群實體載入放置(Botton)
-            Args.ButtonInfo btn_FamilyPlace = new Args.ButtonInfo();
-            btn_FamilyPlace.Name = "Template";
-            btn_FamilyPlace.Text = "Symbol place";
-            btn_FamilyPlace.AssemblyName = @"C:\Users\user\Desktop\Task\RevitByEric\Revit_v2018\bin\Debug\Revit_v2018.dll";
-            btn_FamilyPlace.ClassName = "Revit_v2018.Command.Command_FamilySymbolLoadAndPlace";
-            btn_FamilyPlace.ImgURi = function.ImgPath("Place");
-
             // 族群實體放置(Botton)
             Args.ButtonInfo btn_DisAndFamilyPlace = new Args.ButtonInfo();
             btn_DisAndFamilyPlace.Name = "TemplateClass";
@@ -50,7 +42,6 @@ namespace Revit_v2018
 
             application.CreateRibbonTab(TabName);
             RibbonPanel ribbonPanel = function.CreatePanel(application, TabName, PanelName);
-            function.CreateButton(ribbonPanel, btn_FamilyPlace);
             function.CreateButton(ribbonPanel, btn_DisAndFamilyPlace);
             function.CreateButton(ribbonPanel, btn_test);
 
@@ -65,10 +56,6 @@ namespace Revit_v2018
 
         private void RegisterDockablePanel(UIControlledApplication application) 
         {
-            DockableUI.UI_FamilySymbolLoadAndPlace Page_FamilySymbolLoadAndPlace = new DockableUI.UI_FamilySymbolLoadAndPlace();
-            DockablePaneId paneId = new DockablePaneId(new Guid("{9E105067-C67F-4FC9-96C2-B78422D6AF1A}"));
-            application.RegisterDockablePane(paneId, "FamilySymbolLoadAndPlace", (IDockablePaneProvider)Page_FamilySymbolLoadAndPlace);
-
             DockableUI.UI_SymbolDisplayAndPlacement Page_SymbolDisplayAndPlacement = new DockableUI.UI_SymbolDisplayAndPlacement();
             DockablePaneId paneId_SymbolDisplayAndPlacement = new DockablePaneId(new Guid("{5A1052C5-99BB-493A-BF7B-A039F050439A}"));
             application.RegisterDockablePane(paneId_SymbolDisplayAndPlacement, "SymbolDisplayAndPlacement", (IDockablePaneProvider)Page_SymbolDisplayAndPlacement);
@@ -84,6 +71,9 @@ namespace Revit_v2018
             Event_GetFamilySymbol = new HandlerEvent.Event_GetFamilySymbol();
             Event_GetFamilySymbol_ = ExternalEvent.Create(Event_GetFamilySymbol);
             Event_GetFamilySymbol_.Raise();
+
+            if (DockableUI.UI_SymbolDisplayAndPlacement.VM_SymbolList.SList != null)
+                DockableUI.UI_SymbolDisplayAndPlacement.VM_SymbolList.SList.Clear();
         }
         
     }

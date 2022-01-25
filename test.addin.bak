@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+	<Name>ControlPanel</Name>
+    <Assembly>C:\Users\user\Desktop\Task\RevitByEric\Revit_v2018\bin\Debug\Revit_v2018.dll</Assembly>
+    <ClientId>13d32509-1118-4a53-8ad4-3d655f782eaa</ClientId>
+    <FullClassName>JohnsonRevitAPI2.ControlPanel</FullClassName>
+    <VendorId>ADSK</VendorId>
+    <VendorDescription>Autodesk, www.autodesk.com</VendorDescription>
+  </AddIn>
+</RevitAddIns>

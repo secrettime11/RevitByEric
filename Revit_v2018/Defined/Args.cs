@@ -18,6 +18,7 @@ namespace Revit_v2018.Defined
         public static string NowObj = String.Empty;
         public static List<string> Category = new List<string>();
         public static List<string> Category_Sort = new List<string>();
+        public static string version { get; set; }
 
         public class ButtonInfo
         {
@@ -26,23 +27,9 @@ namespace Revit_v2018.Defined
             public string AssemblyName { get; set; }
             public string ClassName { get; set; }
             public string ImgURi { get; set; }
+            public string ToolTip { get; set; }
+            public string LongDescription { get; set; }
         }
-
-        public class ListView_Class
-        {
-            public string String_Name { get; set; }
-            public string String_FileName { get; set; }
-        }
-
-        public static class Families_ThatMustBeLoaded
-        {
-            public static string myString00 = "Furniture Chair Executive";
-            public static string myString01 = "Furniture Chair Viper";
-            public static string myString02 = "Furniture Couch Viper";
-
-            public static List<string> ListStringMustHaveFamilies = new List<string>() { myString00, myString01, myString02 };
-        }
-
         public class Data
         {
             /// <summary>
