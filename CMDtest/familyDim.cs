@@ -11,354 +11,113 @@ using System.Threading.Tasks;
 
 namespace CMDtest
 {
-    [TransactionAttribute(Autodesk.Revit.Attributes.TransactionMode.Manual)]
+    [Transaction(TransactionMode.Manual)]
+    [Regeneration(RegenerationOption.Manual)]
+    [Journaling(JournalingMode.NoCommandData)]
     public class familyDim : IExternalCommand
     {
-        static Options _opt = null;
         public Result Execute(ExternalCommandData commandData, ref string msg, ElementSet elemSet)
         {
-            UIApplication app = commandData.Application;
-            UIDocument uidoc = app.ActiveUIDocument;
+            Dimension(commandData);
+            return Result.Succeeded;
+        }
+        public void Dimension(ExternalCommandData commandData)
+        {
+            UIApplication uiapp = commandData.Application;
+            UIDocument uidoc = uiapp.ActiveUIDocument;
+            Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
-            JtPairPicker<FamilyInstance> picker
-              = new JtPairPicker<FamilyInstance>(uidoc);
+            List<Reference> familyInstance = new List<Reference>();
 
-            Result rc = picker.Pick();
+            Selection selection = commandData.Application.ActiveUIDocument.Selection;
 
-            if (Result.Failed == rc)
-            {
-                //message = "We need at least two "
-                //  + "FamilyInstance elements in the model.";
-            }
-            else if (Result.Succeeded == rc)
-            {
-                IList<FamilyInstance> a = picker.Selected;
+            Reference eRef = selection.PickObject(ObjectType.Element, "objOne");
+            Reference eRef2 = selection.PickObject(ObjectType.Element, "objTwo");
 
-                _opt = new Options();
-                _opt.ComputeReferences = true;
-                _opt.IncludeNonVisibleObjects = true;
-                _opt.View = doc.ActiveView;
+            Element element = doc.GetElement(eRef);
+            Element element2 = doc.GetElement(eRef2);
 
-                XYZ[] pts = new XYZ[2];
-                Reference[] refs = new Reference[2];
+            // 標中線 撒水頭 CenterLeftRight 管束 CenterFrontBack
+            familyInstance.Add(refType(element));
+            familyInstance.Add(refType(element2));
 
-                pts[0] = (a[0].Location as LocationPoint).Point;
-                pts[1] = (a[1].Location as LocationPoint).Point;
+            LocationPoint locationPoint1 = element.Location as LocationPoint;
+            LocationPoint locationPoint2 = element2.Location as LocationPoint;
 
-                refs[0] = a[0].GetReferences(FamilyInstanceReferenceType.CenterLeftRight).FirstOrDefault();
-                refs[1] = a[1].GetReferences(FamilyInstanceReferenceType.CenterLeftRight).FirstOrDefault();
+            XYZ coordinate1 = locationPoint1.Point;
+            XYZ coordinate2 = locationPoint2.Point;
 
-                //refs[0] = GetFamilyInstancePointReference(a[0]);
-                //refs[1] = GetFamilyInstancePointReference(a[1]);
+            //IsSameDirection(coordinate1, coordinate2);
+            //TaskDialog.Show("IsSameDirection", IsSameDirection(coordinate1, coordinate2).ToString());
+            //TaskDialog.Show("Distance",coordinate1.DistanceTo(coordinate2).ToString());
 
-                if (refs[0] != null && refs[1] != null)
-                {
-                    CmdDimensionWallsIterateFaces.CreateDimensionElement(doc.ActiveView, pts[0], refs[0], pts[1], refs[1]);
-                }
-                else
-                {
-                    TaskDialog.Show("title", "null");
-                }
-            }
-            return rc;
+            DimByTwoXYZ(commandData, coordinate1, coordinate2, familyInstance);
         }
-
-        public void dimensionConsolidation(ExternalCommandData commandData)
+        public void DimByTwoXYZ(ExternalCommandData commandData, XYZ pt1, XYZ pt2, List<Reference> familyInstance)
         {
             UIApplication uiapp = commandData.Application;
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uidoc.Document;
+            View activeView = uidoc.ActiveView;
 
-            Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
 
-            Autodesk.Revit.DB.View view = doc.ActiveView;
-            ViewType vt = view.ViewType;
-            if (vt == ViewType.FloorPlan || vt == ViewType.Elevation)
+            pt1 = new XYZ(pt1.X, pt1.Y, 0);
+            pt2 = new XYZ(pt2.X, pt2.Y, 0);
+
+            using (Transaction tx = new Transaction(doc))
             {
-                Reference eRef = uidoc.Selection.PickObject(ObjectType.Element, "Please pick a curve based element like wall.");
-                Element element = doc.GetElement(eRef);
-                if (eRef != null && element != null)
+                tx.Start("tx");
+
+                ReferenceArray refArray = new ReferenceArray();
+                refArray.Append(familyInstance[0]);
+                refArray.Append(familyInstance[1]);
+
+                // Default Horizontal [top]
+                XYZ dimPoint1 = new XYZ(pt1.X, pt1.Y + 1, pt1.Z);
+                XYZ dimPoint2 = new XYZ(pt2.X, pt2.Y + 1, pt2.Z);
+
+                // Set Vertical [left]
+                if (pt1.X == pt2.X)
                 {
-                    XYZ dirVec = new XYZ();
-                    XYZ viewNormal = view.ViewDirection;
-
-                    LocationCurve locCurve = element.Location as LocationCurve;
-                    if (locCurve == null || locCurve.Curve == null)
-                    {
-                        TaskDialog.Show("Prompt", "Selected element isn’t curve based!");
-                        //  return Result.Cancelled;
-                    }
-                    XYZ dirCur = locCurve.Curve.GetEndPoint(0).Subtract(locCurve.Curve.GetEndPoint(1)).Normalize();
-                    double d = dirCur.DotProduct(viewNormal);
-                    if (d > -0.000000001 && d < 0.000000001)
-                    {
-                        dirVec = dirCur.CrossProduct(viewNormal);
-                        XYZ p1 = locCurve.Curve.GetEndPoint(0);
-                        XYZ p2 = locCurve.Curve.GetEndPoint(1);
-                        XYZ dirLine = XYZ.Zero.Add(p1);
-                        XYZ newVec = XYZ.Zero.Add(dirVec);
-                        newVec = newVec.Normalize().Multiply(3);
-                        dirLine = dirLine.Subtract(p2);
-                        p1 = p1.Add(newVec);
-                        p2 = p2.Add(newVec);
-                        Line newLine = Line.CreateBound(p1, p2);
-                        ReferenceArray arrRefs = new ReferenceArray();
-                        Options options = app.Create.NewGeometryOptions();
-                        options.ComputeReferences = true;
-                        options.DetailLevel = ViewDetailLevel.Fine;
-                        GeometryElement gelement = element.get_Geometry(options);
-                        foreach (var geoObject in gelement)
-                        {
-                            Solid solid = geoObject as Solid;
-                            if (solid == null)
-                                continue;
-
-                            FaceArrayIterator fIt = solid.Faces.ForwardIterator();
-                            while (fIt.MoveNext())
-                            {
-                                PlanarFace p = fIt.Current as PlanarFace;
-                                if (p == null)
-                                    continue;
-
-                                p2 = p.FaceNormal.CrossProduct(dirLine);
-                                if (p2.IsZeroLength())
-                                {
-                                    arrRefs.Append(p.Reference);
-                                }
-                                if (2 == arrRefs.Size)
-                                {
-                                    break;
-                                }
-                            }
-                            if (2 == arrRefs.Size)
-                            {
-                                break;
-                            }
-                        }
-                        if (arrRefs.Size != 2)
-                        {
-                            TaskDialog.Show("Prompt", "Couldn’t find enough reference for creating dimension");
-                            //return Result.Cancelled;
-                        }
-
-                        Transaction trans = new Transaction(doc, "create dimension");
-                        trans.Start();
-                        doc.Create.NewDimension(doc.ActiveView, newLine, arrRefs);
-                        trans.Commit();
-                    }
-                    else
-                    {
-                        TaskDialog.Show("Prompt", "Selected element isn’t curve based!");
-                        // return Result.Cancelled;
-                    }
+                    dimPoint1 = new XYZ(pt1.X - 1, pt1.Y, pt1.Z);
+                    dimPoint2 = new XYZ(pt2.X - 1, pt2.Y, pt2.Z);
                 }
+
+                if (!pt1.X.ToString("F3").Equals(pt2.X.ToString("F3"))  && !pt1.Y.ToString("F3").Equals(pt2.Y.ToString("F3")))
+                {
+                    dimPoint1 = new XYZ(pt1.X - 1, pt1.Y, pt1.Z);
+                    dimPoint2 = new XYZ(pt2.X - 1, pt1.Y, pt2.Z);
+                }
+
+                Line dimLine = Line.CreateBound(dimPoint1, dimPoint2);
+
+                Dimension dim = doc.Create.NewDimension(activeView, dimLine, refArray);
+                //TaskDialog.Show("dim.Value", dim.ValueString);
+                //dim.DimensionType = SetDimStyle(doc);
+
+                tx.Commit();
+            }
+        }
+        private Reference refType(Element element)
+        {
+            if (element.Category.Name == "撒水頭")
+            {
+                return (element as FamilyInstance).GetReferences(FamilyInstanceReferenceType.CenterLeftRight).FirstOrDefault();
             }
             else
             {
-                TaskDialog.Show("Prompt", "Only support Plan View or Elevation View");
+                return (element as FamilyInstance).GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
             }
         }
-
-        /// <summary>
-        /// Retrieve the given family instance's
-        /// non-visible geometry point reference.
-        /// </summary>
-        Reference GetFamilyInstancePointReference(FamilyInstance fi)
+        public static bool IsParallel(XYZ vt1, XYZ vt2, double dDist = 0.001)
         {
-            return fi.get_Geometry(_opt)
-              .OfType<Point>()
-              .Select(x => x.Reference)
-              .FirstOrDefault();
+            return vt1.Normalize().DistanceTo(vt2.Normalize()) < dDist || vt1.Normalize().DistanceTo(-vt2.Normalize()) < dDist;
         }
-        class JtPairPicker<T> where T : Element
+        public static bool IsSameDirection(XYZ vt1, XYZ vt2, double dDist = 0.001)
         {
-            UIDocument _uidoc;
-            Document _doc;
-            List<T> _a;
-
-            /// <summary>
-            /// Allow selection of elements of type T only.
-            /// </summary>
-            class ElementsOfClassSelectionFilter<T2> : ISelectionFilter
-            {
-                public bool AllowElement(Element e)
-                {
-                    return e is T2;
-                }
-
-                public bool AllowReference(Reference r, XYZ p)
-                {
-                    return true;
-                }
-            }
-
-            public JtPairPicker(UIDocument uidoc)
-            {
-                _uidoc = uidoc;
-                _doc = _uidoc.Document;
-            }
-
-            /// <summary>
-            /// Return selection result.
-            /// </summary>
-            public IList<T> Selected
-            {
-                get
-                {
-                    return _a;
-                }
-            }
-
-            /// <summary>
-            /// Run the automatic or interactive 
-            /// selection process.
-            /// </summary>
-            public Result Pick()
-            {
-                // Retrieve all T elements in the entire model.
-
-                _a = new List<T>(
-                  new FilteredElementCollector(_doc)
-                    .OfClass(typeof(T))
-                    .ToElements()
-                    .Cast<T>());
-
-                int n = _a.Count;
-
-                // If there are less than two, 
-                // there is nothing we can do.
-
-                if (2 > n)
-                {
-                    return Result.Failed;
-                }
-
-                // If there are exactly two, pick those.
-
-                if (2 == n)
-                {
-                    return Result.Succeeded;
-                }
-
-                // There are more than two to choose from.
-                // Check for a pre-selection.
-
-                _a.Clear();
-
-                Selection sel = _uidoc.Selection;
-
-                ICollection<ElementId> ids
-                  = sel.GetElementIds();
-
-                n = ids.Count;
-
-                //Debug.Print("{0} pre-selected elements.", n);
-
-                // If two or more T elements were pre-
-                // selected, use the first two encountered.
-
-                if (1 < n)
-                {
-                    foreach (ElementId id in ids)
-                    {
-                        T e = _doc.GetElement(id) as T;
-
-                        //Debug.Assert(null != e,
-                        //"only elements of type T can be picked");
-
-                        _a.Add(e);
-
-                        if (2 == _a.Count)
-                        {
-                            //Debug.Print("Found two pre-selected "
-                            //+ "elements of desired type and "
-                            //+ "ignoring everything else.");
-
-                            break;
-                        }
-                    }
-                }
-
-                // None or less than two elements were pre-
-                // selected, so prompt for an interactive 
-                // post-selection instead.
-
-                if (2 != _a.Count)
-                {
-                    _a.Clear();
-
-                    // Select first element.
-
-                    try
-                    {
-                        Reference r = sel.PickObject(
-                          ObjectType.Element,
-                          new ElementsOfClassSelectionFilter<T>(),
-                          "Please pick first element.");
-
-                        _a.Add(_doc.GetElement(r.ElementId)
-                          as T);
-                    }
-                    catch (Autodesk.Revit.Exceptions
-                      .OperationCanceledException)
-                    {
-                        return Result.Cancelled;
-                    }
-
-                    // Select second element.
-
-                    try
-                    {
-                        Reference r = sel.PickObject(
-                          ObjectType.Element,
-                          new ElementsOfClassSelectionFilter<T>(),
-                          "Please pick second element.");
-
-                        _a.Add(_doc.GetElement(r.ElementId)
-                          as T);
-                    }
-                    catch (Autodesk.Revit.Exceptions
-                      .OperationCanceledException)
-                    {
-                        return Result.Cancelled;
-                    }
-                }
-                return Result.Succeeded;
-            }
+            return vt1.Normalize().DistanceTo(vt2.Normalize()) < dDist;
         }
-        class CmdDimensionWallsIterateFaces
-        {
 
-            /// <summary>
-            ///     Create a new dimension element using the given
-            ///     references and dimension line end points.
-            ///     This method opens and commits its own transaction,
-            ///     assuming that no transaction is open yet and manual
-            ///     transaction mode is being used.
-            ///     Note that this has only been tested so far using
-            ///     references to surfaces on planar walls in a plan
-            ///     view.
-            /// </summary>
-            public static void CreateDimensionElement(View view, XYZ pt1, Reference r1, XYZ pt2, Reference r2)
-            {
-                var doc = view.Document;
-
-                var ra = new ReferenceArray();
-
-                ra.Append(r1);
-                ra.Append(r2);
-
-                pt1 = new XYZ(pt1.X, pt1.Y, 0);
-                pt2 = new XYZ(pt2.X, pt2.Y, 0);
-
-                var line = Line.CreateBound(pt1, pt2);
-                var t = new Transaction(doc);
-                t.Start("Create New Dimension");
-
-                var dim = doc.Create.NewDimension(view, line, ra);
-                t.Commit();
-            }
-        }
     }
 }

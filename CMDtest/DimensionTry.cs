@@ -21,59 +21,61 @@ namespace CMDtest
 
         public Result Execute(ExternalCommandData commandData, ref string msg, ElementSet elemSet)
         {
-            Document doc = commandData.Application.ActiveUIDocument.Document;
-            Selection selection = commandData.Application.ActiveUIDocument.Selection;
-            Application app = commandData.Application.Application;
-            View activeView = commandData.Application.ActiveUIDocument.ActiveView;
+            //Document doc = commandData.Application.ActiveUIDocument.Document;
+            //Selection selection = commandData.Application.ActiveUIDocument.Selection;
+            //Application app = commandData.Application.Application;
+            //View activeView = commandData.Application.ActiveUIDocument.ActiveView;
 
-            XYZ coordinateA = null;
-            XYZ coordinateB = null;
+            //XYZ coordinateA = null;
+            //XYZ coordinateB = null;
 
-            Reference eRef = selection.PickObject(ObjectType.Element, "yu1");
-            Element element = doc.GetElement(eRef);
+            //Reference eRef = selection.PickObject(ObjectType.Element, "yu1");
+            //Element element = doc.GetElement(eRef);
 
-            LocationPoint LLa = element.Location as LocationPoint;
-            coordinateA = LLa.Point;
+            //LocationPoint LLa = element.Location as LocationPoint;
+            //coordinateA = LLa.Point;
 
-            Reference eRef2 = selection.PickObject(ObjectType.Element, "yu2");
-            Element element2 = doc.GetElement(eRef2);
+            //Reference eRef2 = selection.PickObject(ObjectType.Element, "yu2");
+            //Element element2 = doc.GetElement(eRef2);
 
-            ModelCurve mc2 = doc.GetElement(eRef) as ModelCurve;
+            //ModelCurve mc2 = doc.GetElement(eRef) as ModelCurve;
 
-            LocationPoint LLa2 = element2.Location as LocationPoint;
-            coordinateB = LLa2.Point;
+            //LocationPoint LLa2 = element2.Location as LocationPoint;
+            //coordinateB = LLa2.Point;
 
 
-            XYZ point3 = coordinateA;
-            XYZ point4 = coordinateB;
+            //XYZ point3 = coordinateA;
+            //XYZ point4 = coordinateB;
 
-            Line geomLine3 = Line.CreateBound(point3, point4);
-            Line dummyLine = Line.CreateBound(XYZ.Zero, XYZ.BasisY);
-            
-            using (Transaction tx = new Transaction(doc))
-            {
-                tx.Start("tx");
-                XYZ dimPoint1 = new XYZ(point3.X, point3.Y + 1, 0);
-                XYZ dimPoint2 = new XYZ(point4.X, point4.Y + 1, 0);
-                Line dimLine3 = Line.CreateBound(dimPoint1, dimPoint2);
+            //Line geomLine3 = Line.CreateBound(point3, point4);
+            //Line dummyLine = Line.CreateBound(XYZ.Zero, XYZ.BasisY);
 
-                DetailLine line3 = doc.Create.NewDetailCurve(
-                  activeView, dimLine3) as DetailLine;
+            //using (Transaction tx = new Transaction(doc))
+            //{
+            //    tx.Start("tx");
+            //    XYZ dimPoint1 = new XYZ(point3.X, point3.Y + 1, 0);
+            //    XYZ dimPoint2 = new XYZ(point4.X, point4.Y + 1, 0);
+            //    Line dimLine3 = Line.CreateBound(dimPoint1, dimPoint2);
 
-                DetailLine dummy = doc.Create.NewDetailCurve(
-                  activeView, dummyLine) as DetailLine;
+            //    DetailLine line3 = doc.Create.NewDetailCurve(
+            //      activeView, dimLine3) as DetailLine;
 
-                ReferenceArray refArray = new ReferenceArray();
-                refArray.Append(dummy.GeometryCurve.Reference);
-                refArray.Append(line3.GeometryCurve.GetEndPointReference(0));
-                refArray.Append(line3.GeometryCurve.GetEndPointReference(1));
+            //    DetailLine dummy = doc.Create.NewDetailCurve(
+            //      activeView, dummyLine) as DetailLine;
 
-                Dimension dim = doc.Create.NewDimension(
-                  activeView, dimLine3, refArray);
+            //    ReferenceArray refArray = new ReferenceArray();
+            //    refArray.Append(dummy.GeometryCurve.Reference);
+            //    refArray.Append(line3.GeometryCurve.GetEndPointReference(0));
+            //    refArray.Append(line3.GeometryCurve.GetEndPointReference(1));
 
-                doc.Delete(dummy.Id);
-                tx.Commit();
-            }
+            //    Dimension dim = doc.Create.NewDimension(
+            //      activeView, dimLine3, refArray);
+
+            //    doc.Delete(dummy.Id);
+            //    tx.Commit();
+            //}
+
+            AutoColumnGridDim(commandData);
 
             return Result.Succeeded;
         }

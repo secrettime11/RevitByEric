@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,36 +22,11 @@ namespace CMDtest
     {
         public Result Execute(ExternalCommandData commandData, ref string msg, ElementSet elemSet)
         {
-            UIApplication uiapp = commandData.Application;
-            UIDocument uidoc = uiapp.ActiveUIDocument;
-            Application app = uiapp.Application;
-            Document doc = uidoc.Document;
-
-            List<Reference> familyInstance = new List<Reference>();
-
-            Selection selection = commandData.Application.ActiveUIDocument.Selection;
-
-            Reference eRef = selection.PickObject(ObjectType.Element, "item1");
-            Reference eRef2 = selection.PickObject(ObjectType.Element, "item2");
-
-            Element element = doc.GetElement(eRef);
-            Element element2 = doc.GetElement(eRef2);
-
-            // 標中線 撒水頭 CenterLeftRight 管束 CenterFrontBack
-            familyInstance.Add(refType(element));
-            familyInstance.Add(refType(element2));
-
-            LocationPoint locationPoint1 = element.Location as LocationPoint;
-            LocationPoint locationPoint2 = element2.Location as LocationPoint;
-
-            XYZ coordinate1 = locationPoint1.Point;
-            XYZ coordinate2 = locationPoint2.Point;
-
-            DimByTwoXYZ(commandData, coordinate1, coordinate2, familyInstance);
+            AutoDimensionForm autoDimension = new AutoDimensionForm();
+            autoDimension.Show();
 
             return Result.Succeeded;
         }
-
 
         public void DimByTwoXYZ(ExternalCommandData commandData, XYZ pt1, XYZ pt2, List<Reference> familyInstance)
         {
@@ -59,13 +35,9 @@ namespace CMDtest
             Document doc = uidoc.Document;
             View activeView = uidoc.ActiveView;
 
-
-            pt1 = new XYZ(pt1.X, pt1.Y, 0);
-            pt2 = new XYZ(pt2.X, pt2.Y, 0);
-
             using (Transaction tx = new Transaction(doc))
             {
-                tx.Start("tx");
+                tx.Start("Dimension mission");
 
                 ReferenceArray refArray = new ReferenceArray();
                 refArray.Append(familyInstance[0]);
@@ -84,15 +56,13 @@ namespace CMDtest
 
                 Line dimLine = Line.CreateBound(dimPoint1, dimPoint2);
 
-                Dimension dim = doc.Create.NewDimension(activeView, dimLine, refArray);
-
-                //dim.DimensionType = SetDimStyle(doc);
+                // Dimension
+                doc.Create.NewDimension(activeView, dimLine, refArray);
 
                 tx.Commit();
             }
         }
-
-        private Reference refType(Element element) 
+        private Reference refType(Element element)
         {
             if (element.Category.Name == "撒水頭")
             {
@@ -102,85 +72,6 @@ namespace CMDtest
             {
                 return (element as FamilyInstance).GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
             }
-        }
-        /// <summary>
-        /// ModelCurve dim with CreateLinearDimension function
-        /// </summary>
-        /// <param name="uidoc"></param>
-        /// <param name="app"></param>
-        /// <param name="P1"></param>
-        /// <param name="P2"></param>
-        public void PickPoint(UIDocument uidoc, Application app, XYZ P1, XYZ P2)
-        {
-            View activeView = uidoc.ActiveView;
-            SketchPlane sketch = activeView.SketchPlane;
-            ObjectSnapTypes snapTypes = ObjectSnapTypes.Endpoints | ObjectSnapTypes.Intersections | ObjectSnapTypes.Points | ObjectSnapTypes.Perpendicular;
-            XYZ startPoint;
-            XYZ endPoint;
-
-            Plane geometryPlane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, XYZ.Zero);
-
-            sketch = SketchPlane.Create(uidoc.Document, geometryPlane);
-
-            uidoc.Document.ActiveView.SketchPlane = sketch;
-
-            // 顯示工作區域
-            //uidoc.Document.ActiveView.ShowActiveWorkPlane();
-            try
-            {
-                //startPoint = uidoc.Selection.PickPoint(snapTypes, "Select start point");
-                //endPoint = uidoc.Selection.PickPoint(snapTypes, "Select end point");
-                startPoint = P1;
-                endPoint = P2;
-
-            }
-            catch (Autodesk.Revit.Exceptions.OperationCanceledException oc)
-            {
-                Console.WriteLine(oc.Message);
-                return;
-            }
-            catch (Autodesk.Revit.Exceptions.InvalidOperationException oe)
-            {
-                Console.WriteLine(oe.Message);
-                TaskDialog.Show("Revit", "No work plane set in current view.");
-                return;
-
-            }
-            catch (Autodesk.Revit.Exceptions.ArgumentNullException n)
-            {
-                Console.WriteLine(n.Message);
-                return;
-            }
-
-            double dist = startPoint.DistanceTo(endPoint);
-
-            string distance = "Distance is " + dist.ToString();
-            string strCoords = "Selected start point is " + startPoint.ToString() + "\nSelected end point is " + endPoint.ToString() + distance;
-            Line line = Line.CreateBound(startPoint, endPoint);
-            //TaskDialog.Show("Revit", strCoords);
-            CreateLinearDimension(uidoc.Document, startPoint, endPoint, sketch, app, activeView);
-
-        }
-        public void CreateLinearDimension(Document doc, XYZ pt1, XYZ pt2, SketchPlane sketch, Application app, View view)
-        {
-            // first create line
-
-            pt1 = new XYZ(pt1.X, pt1.Y + 1, 0);
-            pt2 = new XYZ(pt2.X, pt2.Y + 1, 0);
-
-            Line line = Line.CreateBound(pt1, pt2);
-            ModelCurve modelcurve = doc.Create
-            .NewModelCurve(line, sketch);
-
-            //GraphicsStyle gs2 = modelcurve.LineStyle as GraphicsStyle;
-            //gs2.GraphicsStyleCategory.LineColor = new Color(255, 255, 255);
-
-            ReferenceArray ra = new ReferenceArray();
-            ra.Append(modelcurve.GeometryCurve.GetEndPointReference(0));
-            ra.Append(modelcurve.GeometryCurve.GetEndPointReference(1));
-
-            doc.Create.NewDimension(doc.ActiveView, line, ra);
-            doc.Delete(modelcurve.Id);
         }
         public List<Solid> GetAllSolid(Application rapp, Element e)
         {
@@ -259,5 +150,44 @@ namespace CMDtest
 
             return newdimesionType;
         }
+
+        /// <summary>
+        /// 判斷兩個向量是否平行，包含方向相反
+        /// 通過Normalize()將兩個向量單位正交化，這樣就可以通過比較這兩個單位向量的大小
+        /// 或者說比較這兩個點是否重合來比較。
+        /// </summary>
+        /// <param name="vt1"></param>
+        /// <param name="vt2"></param>
+        /// <param name="dDist"></param>
+        /// <returns></returns>
+        public static bool IsParallel(XYZ vt1, XYZ vt2, double dDist = 0.001)
+        {
+            return vt1.Normalize().DistanceTo(vt2.Normalize()) < dDist || vt1.Normalize().DistanceTo(-vt2.Normalize()) < dDist;
+        }
+
+        /// <summary>
+        /// 判斷兩個向量是否同向
+        /// </summary>
+        /// <param name="vt1"></param>
+        /// <param name="vt2"></param>
+        /// <param name="dDist"></param>
+        /// <returns></returns>
+        public static bool IsSameDirection(XYZ vt1, XYZ vt2, double dDist = 0.001)
+        {
+            return vt1.Normalize().DistanceTo(vt2.Normalize()) < dDist;
+        }
+
+        /// <summary>
+        /// 判斷兩個向量是否垂直，通過判斷兩個向量的點乘（若等於0說明垂直）
+        /// </summary>
+        /// <param name="vt1"></param>
+        /// <param name="vt2"></param>
+        /// <param name="dDist"></param>
+        /// <returns></returns>
+        public static bool IsPerpendicular(XYZ vt1, XYZ vt2, double dDist = 0.001)
+        {
+            return Math.Abs(vt1.Normalize().DotProduct(vt2.Normalize())) < dDist;
+        }
+
     }
 }

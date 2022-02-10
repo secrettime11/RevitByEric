@@ -34,7 +34,8 @@ namespace CMDtest
             using (StreamWriter sw = File.AppendText($@"{logPath}\{logFileName}"))
             {
                 sw.WriteLine(content);
-                sw.WriteLine();
+                //sw.WriteLine();
+                //sw.WriteLine();
             }
             if (openFile)
             {

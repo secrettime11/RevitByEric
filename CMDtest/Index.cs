@@ -21,7 +21,12 @@ namespace CMDtest
     {
         public Result Execute(ExternalCommandData commandData, ref string msg, ElementSet elemSet)
         {
+            UIDocument uidoc = commandData.Application.ActiveUIDocument;
+
+            Document doc = uidoc.Document;
+
             //SpecialDim(commandData);
+            MarkPipe(doc, uidoc);
             return Result.Succeeded;
         }
 
@@ -324,46 +329,6 @@ namespace CMDtest
             XYZ maxPointX = null;
             foreach (Element elem in collector.ToElements())
             {
-                //if (elem is Grid)
-                //{
-                //    Grid grid = elem as Grid;
-                //    Line gLine = grid.Curve as Line;
-                //    XYZ gDir = gLine.Direction;
-
-                //    if (gDir.IsAlmostEqualTo(xDir) || gDir.IsAlmostEqualTo(-xDir))
-                //    {
-                //        XYZ startPoint = gLine.GetEndPoint(0);
-                //        double y = startPoint.Y;
-                //        if (y < minY)
-                //        {
-                //            minY = y;
-                //            minPoint = startPoint;
-                //        }
-                //        else if (y > maxY)
-                //        {
-                //            maxY = y;
-                //            maxPoint = startPoint;
-                //        }
-                //        refArrayX.Append(new Reference(elem));
-                //    }
-                //    else if (gDir.IsAlmostEqualTo(yDir) || gDir.IsAlmostEqualTo(-yDir))
-                //    {
-                //        XYZ startPoint = gLine.GetEndPoint(0);
-                //        double x = startPoint.X;
-                //        if (x < minX)
-                //        {
-                //            minX = x;
-                //            minPointX = startPoint;
-                //        }
-                //        else if (x > maxX)
-                //        {
-                //            maxX = x;
-                //            maxPointX = startPoint;
-                //        }
-                //        refArrayY.Append(new Reference(elem));
-                //    }
-                //}
-                //else
                 if (elem is Pipe)
                 {
                     Pipe pipe = elem as Pipe;
@@ -419,7 +384,6 @@ namespace CMDtest
             {
                 trans.Start("Create Dimension");
                 doc.Create.NewDimension(doc.ActiveView, yLine, refArrayX);
-
                 doc.Create.NewDimension(doc.ActiveView, xLine, refArrayY);
                 trans.Commit();
             }
