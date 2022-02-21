@@ -43,6 +43,7 @@
       <HintPath>..\..\..\RevitAPI\Samples\Revit\RevitAPIUI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -69,6 +70,21 @@
     <Compile Include="CommonEqualityComparer.cs" />
     <Compile Include="date0208.cs" />
     <Compile Include="DimensionTry.cs" />
+    <Compile Include="Dim\Dim.cs" />
+    <Compile Include="Dim\DimForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dim\DimForm.Designer.cs">
+      <DependentUpon>DimForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dim\Dim_handler.cs" />
+    <Compile Include="Dim\ExtraForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dim\ExtraForm.Designer.cs">
+      <DependentUpon>ExtraForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dim\Model.cs" />
     <Compile Include="familyDim.cs" />
     <Compile Include="Handler\Dimension_Handler.cs" />
     <Compile Include="Handler\PipeDim_handler.cs" />
@@ -82,11 +98,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Dim\App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AutoDimensionForm.resx">
       <DependentUpon>AutoDimensionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dim\DimForm.resx">
+      <DependentUpon>DimForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dim\ExtraForm.resx">
+      <DependentUpon>ExtraForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
