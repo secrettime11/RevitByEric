@@ -69,7 +69,6 @@ namespace CMDtest.Handler
             }
         }
 
-
         public string GetName()
         {
             return "PipeDim_handler";

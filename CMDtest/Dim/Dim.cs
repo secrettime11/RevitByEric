@@ -14,13 +14,14 @@ namespace CMDtest.Dim
     [Journaling(JournalingMode.NoCommandData)]
     public class Dim: IExternalCommand
     {
-        public Result Execute(ExternalCommandData commandData, ref string msg, ElementSet elemSet)
+        public static ExternalCommandData commandData { get; set; }
+        public Result Execute(ExternalCommandData CMD, ref string msg, ElementSet elemSet)
         {
+            commandData = CMD;
             DimForm dimForm = new DimForm();
             dimForm.Show();
 
             return Result.Succeeded;
         }
-       
     }
 }

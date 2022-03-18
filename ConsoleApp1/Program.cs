@@ -1,5 +1,8 @@
-﻿using System;
+﻿using log4net;
+using log4net.Config;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,14 +13,7 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            for (int i = 0; i < 5; i++)
-            {
-                if (i == 2)
-                {
-                    continue;
-                }
-                Console.WriteLine(i);
-            }
+            LogisTrac.WriteLog(typeof(string), "");
             Console.Read();
         }
     }

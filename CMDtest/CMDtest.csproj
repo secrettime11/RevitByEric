@@ -66,6 +66,24 @@
     <Compile Include="AutoDimensionForm.Designer.cs">
       <DependentUpon>AutoDimensionForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ColorPipe\3Devent.cs" />
+    <Compile Include="ColorPipe\Cmd_colorPipe.cs" />
+    <Compile Include="ColorPipe\Colorback.cs" />
+    <Compile Include="ColorPipe\ColorPipeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ColorPipe\ColorPipeForm.Designer.cs">
+      <DependentUpon>ColorPipeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ColorPipe\detailForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ColorPipe\detailForm.Designer.cs">
+      <DependentUpon>detailForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ColorPipe\eventb.cs" />
+    <Compile Include="ColorPipe\event_.cs" />
+    <Compile Include="ColorPipe\Model.cs" />
     <Compile Include="Comboooo.cs" />
     <Compile Include="CommonEqualityComparer.cs" />
     <Compile Include="date0208.cs" />
@@ -86,15 +104,29 @@
     </Compile>
     <Compile Include="Dim\Model.cs" />
     <Compile Include="familyDim.cs" />
+    <Compile Include="FindDwg\DWGInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FindDwg\DWGInfo.Designer.cs">
+      <DependentUpon>DWGInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FindDwg\FindDWG.cs" />
+    <Compile Include="FindDwg\GetDWG.cs" />
+    <Compile Include="FindDwg\importH.cs" />
+    <Compile Include="FindDwg\IReportImportData.cs" />
+    <Compile Include="FindDwg\Model.cs" />
+    <Compile Include="FindDwg\SimpleTextFileBasedReporter.cs" />
     <Compile Include="Handler\Dimension_Handler.cs" />
     <Compile Include="Handler\PipeDim_handler.cs" />
     <Compile Include="Index.cs" />
+    <Compile Include="ini.cs" />
     <Compile Include="lastTry.cs" />
     <Compile Include="LastTTT.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="NewVersion0121.cs" />
     <Compile Include="Parameters\Dimension_Parameters.cs" />
+    <Compile Include="PipeColor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -105,11 +137,20 @@
     <EmbeddedResource Include="AutoDimensionForm.resx">
       <DependentUpon>AutoDimensionForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ColorPipe\ColorPipeForm.resx">
+      <DependentUpon>ColorPipeForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ColorPipe\detailForm.resx">
+      <DependentUpon>detailForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dim\DimForm.resx">
       <DependentUpon>DimForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dim\ExtraForm.resx">
       <DependentUpon>ExtraForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FindDwg\DWGInfo.resx">
+      <DependentUpon>DWGInfo.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -23,6 +23,7 @@ namespace CMDtest.Dim
             /// </summary>
             public static string BaseY { get; set; }
             public static decimal MainPipeDia { get; set; }
+            public static string DimType { get; set; }
         }
         public class ElementInfo
         {

@@ -25,8 +25,8 @@ namespace CMDtest
 
             Document doc = uidoc.Document;
 
-            //SpecialDim(commandData);
-            MarkPipe(doc, uidoc);
+            SpecialDim(commandData);
+            //MarkPipe(doc, uidoc);
             return Result.Succeeded;
         }
 

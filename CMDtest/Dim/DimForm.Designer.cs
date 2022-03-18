@@ -41,14 +41,9 @@
             this.ckcb_baseX_up = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.btn_dim = new System.Windows.Forms.Button();
-            this.btn_ini = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.txt_pipeDiameter = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.cb_dimType = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -108,7 +103,7 @@
             this.groupBox3.Controls.Add(this.ckcb_baseX_down);
             this.groupBox3.Controls.Add(this.ckcb_baseX_up);
             this.groupBox3.Controls.Add(this.label4);
-            this.groupBox3.Location = new System.Drawing.Point(8, 117);
+            this.groupBox3.Location = new System.Drawing.Point(8, 59);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(178, 83);
             this.groupBox3.TabIndex = 5;
@@ -193,73 +188,32 @@
             // btn_dim
             // 
             this.btn_dim.Font = new System.Drawing.Font("微軟正黑體", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.btn_dim.Location = new System.Drawing.Point(101, 206);
+            this.btn_dim.Location = new System.Drawing.Point(8, 179);
             this.btn_dim.Name = "btn_dim";
-            this.btn_dim.Size = new System.Drawing.Size(85, 29);
+            this.btn_dim.Size = new System.Drawing.Size(178, 29);
             this.btn_dim.TabIndex = 6;
             this.btn_dim.Text = "標註";
             this.btn_dim.UseVisualStyleBackColor = true;
             this.btn_dim.Click += new System.EventHandler(this.btn_dim_Click);
             // 
-            // btn_ini
+            // cb_dimType
             // 
-            this.btn_ini.Font = new System.Drawing.Font("微軟正黑體", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.btn_ini.Location = new System.Drawing.Point(8, 206);
-            this.btn_ini.Name = "btn_ini";
-            this.btn_ini.Size = new System.Drawing.Size(87, 29);
-            this.btn_ini.TabIndex = 7;
-            this.btn_ini.Text = "設為默認";
-            this.btn_ini.UseVisualStyleBackColor = true;
-            this.btn_ini.Click += new System.EventHandler(this.btn_ini_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 24);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(53, 12);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "大於等於";
-            // 
-            // txt_pipeDiameter
-            // 
-            this.txt_pipeDiameter.Location = new System.Drawing.Point(71, 17);
-            this.txt_pipeDiameter.Name = "txt_pipeDiameter";
-            this.txt_pipeDiameter.Size = new System.Drawing.Size(65, 22);
-            this.txt_pipeDiameter.TabIndex = 1;
-            this.txt_pipeDiameter.Text = "50";
-            this.txt_pipeDiameter.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(144, 24);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(23, 12);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "mm";
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.label2);
-            this.groupBox2.Controls.Add(this.txt_pipeDiameter);
-            this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Location = new System.Drawing.Point(8, 61);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(178, 50);
-            this.groupBox2.TabIndex = 4;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "幹管直徑";
+            this.cb_dimType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cb_dimType.FormattingEnabled = true;
+            this.cb_dimType.Location = new System.Drawing.Point(8, 148);
+            this.cb_dimType.Name = "cb_dimType";
+            this.cb_dimType.Size = new System.Drawing.Size(178, 20);
+            this.cb_dimType.TabIndex = 7;
+            this.cb_dimType.SelectedIndexChanged += new System.EventHandler(this.cb_dimType_SelectedIndexChanged);
             // 
             // DimForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(196, 239);
-            this.Controls.Add(this.btn_ini);
+            this.ClientSize = new System.Drawing.Size(196, 220);
+            this.Controls.Add(this.cb_dimType);
             this.Controls.Add(this.btn_dim);
             this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.MaximizeBox = false;
             this.Name = "DimForm";
@@ -270,8 +224,6 @@
             this.groupBox1.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -291,10 +243,6 @@
         private System.Windows.Forms.CheckBox ckcb_baseX_up;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btn_dim;
-        private System.Windows.Forms.Button btn_ini;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox txt_pipeDiameter;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.ComboBox cb_dimType;
     }
 }

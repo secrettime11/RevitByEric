@@ -20,14 +20,19 @@ namespace CMDtest.Dim
             doc = uidoc.Document;
             Selection sel = uidoc.Selection;
 
-            IList<Reference> eleSelecArea = sel.PickObjects(ObjectType.Element, "框選標註範圍");
-            List<ElementId> data = (from x in eleSelecArea select x.ElementId).ToList();
-            if (ini.DimInfo.Contains("X"))
-                Dim(data, uidoc, "X");
-            if (ini.DimInfo.Contains("Y"))
-                Dim(data, uidoc, "Y");
-            if (ini.DimInfo.Contains("Hanger"))
-                DimHanger(data, uidoc);
+            using (Transaction tx = new Transaction(doc))
+            {
+                tx.Start("Dimension mission");
+                IList<Reference> eleSelecArea = sel.PickObjects(ObjectType.Element, "框選標註範圍");
+                List<ElementId> data = (from x in eleSelecArea select x.ElementId).ToList();
+                if (ini.DimInfo.Contains("X"))
+                    Dim(data, uidoc, "X");
+                if (ini.DimInfo.Contains("Y"))
+                    Dim(data, uidoc, "Y");
+                if (ini.DimInfo.Contains("Hanger"))
+                    DimHanger(data, uidoc);
+                tx.Commit();
+            }
             //Log.Logger("", true);
         }
         public void Dim(List<ElementId> data, UIDocument uidoc, string axis)
@@ -99,6 +104,8 @@ namespace CMDtest.Dim
                 BorderObj = sprinkler.Where(c => almost(c.point.Y, MaxAxis, 0.1)).OrderBy(x => x.point.X).ToList();
             else
                 BorderObj = sprinkler.Where(c => almost(c.point.X, MaxAxis, 0.1)).OrderBy(x => x.point.Y).ToList();
+
+            //bool isHor = isDimensionHorizen(BorderObj);
 
             List<ElementInfo> passPipes = new List<ElementInfo>();
             // 管是否穿過兩灑水頭之間
@@ -214,7 +221,7 @@ namespace CMDtest.Dim
 
             foreach (var item in Result)
             {
-                Log.Logger($"{item.Key} / {item.Value}", false);
+                //Log.Logger($"{item.Key} / {item.Value}", false);
                 string[] obj = item.Key.Split('_');
                 DimReference R1 = new DimReference();
                 DimReference R2 = new DimReference();
@@ -349,14 +356,14 @@ namespace CMDtest.Dim
 
                 if (type == "V")
                 {
-                    refElement.Add(AccrefType(doc.GetElement(ele1), "X"));
-                    refElement.Add(AccrefType(doc.GetElement(ele2), "X"));
-                    DimensionXY(uidoc, pt1, pt2, refElement, false, "Y", pt1.Y);
+                    refElement.Add(refType(doc.GetElement(ele1)));
+                    refElement.Add(refType(doc.GetElement(ele2)));
+                    DimensionXY(uidoc, pt1, pt2, refElement, false, "Y", pt1.X);
                 }
                 else
                 {
-                    refElement.Add(AccrefType(doc.GetElement(ele1), "Y"));
-                    refElement.Add(AccrefType(doc.GetElement(ele2), "Y"));
+                    refElement.Add(refType(doc.GetElement(ele1)));
+                    refElement.Add(refType(doc.GetElement(ele2)));
                     DimensionXY(uidoc, pt1, pt2, refElement, false, "X", pt1.Y);
                 }
             }
@@ -375,73 +382,77 @@ namespace CMDtest.Dim
             else if (type == "撒水頭")
             {
                 dimReference.point = new XYZ(dimReference.point.X, dimReference.point.Y, 0);
-                dimReference.refElement = refType(doc.GetElement(eid), axis);
+                dimReference.refElement = refBaba(doc.GetElement(eid), axis);
             }
             return dimReference;
         }
         public void DimensionXY(UIDocument uidoc, XYZ pt1, XYZ pt2, List<Reference> refElement, bool special, string axis, double MaxAxis)
         {
             View activeView = uidoc.ActiveView;
-            using (Transaction tx = new Transaction(doc))
+
+
+            ReferenceArray refArray = new ReferenceArray();
+            refArray.Append(refElement[0]);
+            refArray.Append(refElement[1]);
+
+            XYZ dimPoint1 = null;
+            XYZ dimPoint2 = null;
+
+            double dimGap = 1;
+            if (special)
+                dimGap = 2.5;
+
+            if (axis == "X")
             {
-                tx.Start("Dimension mission");
-
-                ReferenceArray refArray = new ReferenceArray();
-                refArray.Append(refElement[0]);
-                refArray.Append(refElement[1]);
-
-                XYZ dimPoint1 = null;
-                XYZ dimPoint2 = null;
-
-                double dimGap = 1;
-                if (special)
-                    dimGap = 2.5;
-
-                if (axis == "X")
+                if (ini.BaseX == "up")
                 {
-                    if (ini.BaseX == "up")
-                    {
-                        dimPoint1 = new XYZ(pt1.X, MaxAxis + dimGap, pt1.Z);
-                        dimPoint2 = new XYZ(pt2.X, MaxAxis + dimGap, pt2.Z);
-                    }
-                    else
-                    {
-                        dimGap = 1.5;
-                        if (special)
-                            dimGap = 3;
-
-                        dimPoint1 = new XYZ(pt1.X, MaxAxis - dimGap, pt1.Z);
-                        dimPoint2 = new XYZ(pt2.X, MaxAxis - dimGap, pt2.Z);
-                    }
+                    dimPoint1 = new XYZ(pt1.X, MaxAxis + dimGap, pt1.Z);
+                    dimPoint2 = new XYZ(pt2.X, MaxAxis + dimGap, pt2.Z);
                 }
-                else if (axis == "Y")
+                else
                 {
-                    if (ini.BaseY == "right")
-                    {
-                        dimPoint1 = new XYZ(MaxAxis + dimGap, pt1.Y, pt1.Z);
-                        dimPoint2 = new XYZ(MaxAxis + dimGap, pt2.Y, pt2.Z);
-                    }
-                    else
-                    {
-                        dimGap = 1.5;
-                        if (special)
-                            dimGap = 3;
+                    dimGap = 1.5;
+                    if (special)
+                        dimGap = 3;
 
-                        dimPoint1 = new XYZ(MaxAxis - dimGap, pt1.Y, pt1.Z);
-                        dimPoint2 = new XYZ(MaxAxis - dimGap, pt2.Y, pt2.Z);
-                    }
+                    dimPoint1 = new XYZ(pt1.X, MaxAxis - dimGap, pt1.Z);
+                    dimPoint2 = new XYZ(pt2.X, MaxAxis - dimGap, pt2.Z);
                 }
-
-                Line dimLine = Line.CreateBound(dimPoint1, dimPoint2);
-                try
-                {
-                    doc.Create.NewDimension(activeView, dimLine, refArray);
-                    tx.Commit();
-                }
-                catch (Exception) { }
             }
-        }
+            else if (axis == "Y")
+            {
+                if (ini.BaseY == "right")
+                {
+                    dimPoint1 = new XYZ(MaxAxis + dimGap, pt1.Y, pt1.Z);
+                    dimPoint2 = new XYZ(MaxAxis + dimGap, pt2.Y, pt2.Z);
+                }
+                else
+                {
+                    dimGap = 1.5;
+                    if (special)
+                        dimGap = 3;
 
+                    dimPoint1 = new XYZ(MaxAxis - dimGap, pt1.Y, pt1.Z);
+                    dimPoint2 = new XYZ(MaxAxis - dimGap, pt2.Y, pt2.Z);
+                }
+            }
+
+            Line dimLine = Line.CreateBound(dimPoint1, dimPoint2);
+            try
+            {
+
+                DimensionType defaultType = (from v in new FilteredElementCollector(doc)
+                                                    .OfClass(typeof(DimensionType))
+                                                    .Cast<DimensionType>()
+                                             where v.Name == ini.DimType
+                                             select v).First();
+                //Log.Logger(ini.DimType, false);
+                Dimension dimension = doc.Create.NewDimension(activeView, dimLine, refArray);
+                dimension.DimensionType = defaultType;
+
+            }
+            catch (Exception) { }
+        }
 
         private bool IsBetween(BoundingBoxXYZ pipe, double maxAxis, List<ElementInfo> BorderObj, string axis)
         {
@@ -533,6 +544,10 @@ namespace CMDtest.Dim
             else
                 return "N";
         }
+        private Reference refType(Element element)
+        {
+            return (element as FamilyInstance).GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
+        }
         private Reference refType(Element element, string axis)
         {
             var refobj = element as FamilyInstance;
@@ -545,6 +560,11 @@ namespace CMDtest.Dim
                     return refobj.GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
                 else
                     return refobj.GetReferences(FamilyInstanceReferenceType.CenterLeftRight).FirstOrDefault();
+
+                //if (axis == "X")
+                //    return refobj.GetReferences(FamilyInstanceReferenceType.CenterLeftRight).FirstOrDefault();
+                //else
+                //    return refobj.GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
             }
             else
             {
@@ -552,15 +572,52 @@ namespace CMDtest.Dim
                     return refobj.GetReferences(FamilyInstanceReferenceType.CenterLeftRight).FirstOrDefault();
                 else
                     return refobj.GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
+
+                //if (axis == "X")
+                //    return refobj.GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
+                //else
+                //    return refobj.GetReferences(FamilyInstanceReferenceType.CenterLeftRight).FirstOrDefault();
             }
         }
-
-        private Reference AccrefType(Element element, string axis)
+        private Reference refBaba(Element element, string axis)
         {
-            if (axis == "X")
-                return (element as FamilyInstance).GetReferences(FamilyInstanceReferenceType.CenterLeftRight).FirstOrDefault();
-            else
-                return (element as FamilyInstance).GetReferences(FamilyInstanceReferenceType.CenterFrontBack).FirstOrDefault();
+            bool isHor = true;
+            if (axis == "Y")
+            {
+                isHor = false;
+            }
+            var familyInstance = element as FamilyInstance;
+            
+            double rotation = (familyInstance.Location as LocationPoint).Rotation;
+            // 是否旋轉180
+            bool phare = Math.Round(rotation / (0.5 * Math.PI) % 2, 4) == 2 || Math.Round(rotation / (0.5 * Math.PI) % 2, 4) == 0;
+            IList<Reference> refs = isHor ^ phare == false ? familyInstance.GetReferences(FamilyInstanceReferenceType.CenterLeftRight)
+                    : familyInstance.GetReferences(FamilyInstanceReferenceType.CenterFrontBack);
+
+            //Log.Logger($"{element.Id} / {axis} / {rotation} / {Math.Round(rotation / (0.5 * Math.PI) % 2, 4)} / {isHor ^ phare}/{refs.Count}",false);
+
+            return refs.Count == 0 ? null : refs[0];
+        }
+        public bool isDimensionHorizen(List<ElementInfo> BorderObj)
+        {
+            if (
+                Math.Abs
+                (
+                   BorderObj.OrderBy(f => f.point.X).Select(f => f.point.X).First()
+                 - BorderObj.OrderByDescending(f => f.point.X).Select(f => f.point.X).First()
+                )
+                >
+                Math.Abs
+                (
+                      BorderObj.OrderBy(f => f.point.Y).Select(f => f.point.Y).First()
+                 - BorderObj.OrderByDescending(f => f.point.Y).Select(f => f.point.Y).First()
+                 )
+                )
+            {
+                return true;
+            }
+            return false;
+
         }
         private bool equalzero(double val)
         {
@@ -574,6 +631,7 @@ namespace CMDtest.Dim
         {
             return "Dim_handler";
         }
+
     }
 
 }
