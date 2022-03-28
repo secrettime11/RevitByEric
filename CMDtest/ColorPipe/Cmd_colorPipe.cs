@@ -41,6 +41,8 @@ namespace CMDtest.ColorPipe
 
             #endregion
             UIApplication uiapp = CMD.Application;
+
+            Model.ProjectName = uiapp.ActiveUIDocument.Document.Title;
             Model.SystemList = new List<SystemType>();
             GetAllFilterInfo(uiapp, Model.SystemList);
 

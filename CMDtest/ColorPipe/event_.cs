@@ -42,7 +42,6 @@ namespace CMDtest.ColorPipe
                         }
                         catch (Exception)
                         {
-
                         }
                     }
                     tx.Commit();
@@ -51,7 +50,9 @@ namespace CMDtest.ColorPipe
                 string symbol = "<!>";
                 foreach (var item in result)
                 {
-                    ini.write($"{item.Date.ToString("yyyy/MM/dd")}{symbol}{item.Id}{symbol}{item.Name}{symbol}{item.Type}{symbol}{item.NowColor.R},{item.NowColor.G},{item.NowColor.B}", ini.iniPath, DateTime.Now.ToString("yyyyMMdd-mm-ss"));
+                    if (Model.fileName == "Default" || Model.fileName == "")
+                        Model.fileName = DateTime.Now.ToString("yyyyMMdd-HH-mm-ss");
+                    ini.write($"{item.Date.ToString("yyyy/MM/dd")}{symbol}{item.Id}{symbol}{item.Name}{symbol}{item.Type}{symbol}{item.NowColor.R},{item.NowColor.G},{item.NowColor.B}", DirPath.ColorPipe + Model.ProjectName, Model.fileName);
                 }
             }
             catch (Exception) { }

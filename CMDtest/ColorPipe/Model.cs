@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,11 @@ namespace CMDtest.ColorPipe
         public static List<SystemType> SystemList { get; set; }
         public static List<SelectEle> SelectEleList { get; set; }
         public static string Status { get; set; }
+        public static string ProjectName { get; set; }
+        public static List<string> NowEleId { get; set; }
+        public static string NameOf3D { get; set; }
+        public static string templateName { get; set; }
+        public static string fileName { get; set; }
     }
     public class Info 
     {
@@ -36,5 +42,11 @@ namespace CMDtest.ColorPipe
     {
         public string Id { get; set; }
         public System.Drawing.Color SysColor { get; set; }
+    }
+
+    public class DirPath
+    {
+        public static string Data = $@"C:\ProgramData\Autodesk\Revit\Addins\Data\";
+        public static string ColorPipe = Data + @"ColorPipe\";
     }
 }

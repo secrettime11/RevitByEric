@@ -10,9 +10,9 @@ namespace JohnsonRevitAPI2.Public_Folder
 {
     public class ini
     {
-        public static string iniPath = $@"C:\ProgramData\Autodesk\Revit\Addins\Data\";
+        //public static string iniPath = $@"C:\ProgramData\Autodesk\Revit\Addins\Data\";
         //public static string ini_CategoryName = "ini_SymbolPlacement.txt";
-        public static string ini_CategorySortName = "tmp.txt";
+        //public static string ini_CategorySortName = "tmp.txt";
         static void createDir(string path)
         {
             if (!Directory.Exists(path))

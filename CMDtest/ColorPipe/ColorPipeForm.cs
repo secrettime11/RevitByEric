@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.UI;
+﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using JohnsonRevitAPI2.Public_Folder;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using View = Autodesk.Revit.DB.View;
 
 namespace CMDtest.ColorPipe
 {
@@ -19,54 +21,39 @@ namespace CMDtest.ColorPipe
         {
             InitializeComponent();
             this.StartPosition = FormStartPosition.CenterScreen;
+            this.Text = Model.ProjectName;
             stretchBtn.BackgroundImage = imageList1.Images[1];
-            this.Text = "ProjectName";
-            btn_colour.BackColor = Color.FromArgb(255,149,255);
+            btn_colour.BackColor = System.Drawing.Color.FromArgb(255,149,255);
             Model.colorSet = btn_colour.BackColor;
-            //dgv_allFile.Rows.Add("demo");
-        }
+            txt_projectName.Text = Model.ProjectName;
+            txt_fileName.Text = "Default";
+            List<string> tmeplate = ApplyViewTemplate();
 
-        private void ColorPipeForm_Load(object sender, EventArgs e)
-        {
-            //txt_filename.Placeholder = DateTime.Now.ToString("yyyy/MM/dd");
-        }
-
-        public class ZhmTextBox : System.Windows.Forms.TextBox
-        {
-            private const int EM_SETCUEBANNER = 0x1501;
-
-            [DllImport("user32.dll", CharSet = CharSet.Auto)]
-            private static extern Int32 SendMessage(IntPtr hWnd, int msg, int wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
-
-            private string placeholder = string.Empty;
-            public string Placeholder
+            foreach (var item in tmeplate)
             {
-                get { return placeholder; }
-                set
-                {
-                    placeholder = value;
-                    SendMessage(Handle, EM_SETCUEBANNER, 0, Placeholder);
-                }
+                cb_template.Items.Add(item);
+            }
+
+            if (cb_template.Items.Count>0)
+            {
+                cb_template.SelectedIndex = 0;
             }
         }
-        public class LocationCheck
-        {
-            public static bool Exist { get; set; } = false;
-        }
-
+        
         private void dgv_allFile_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-           
-
         }
 
         private void ColorPipeForm_Load_1(object sender, EventArgs e)
         {
             loadFile();
+            loadProject();
         }
 
         private void btn_create_Click(object sender, EventArgs e)
         {
+            Model.ProjectName = txt_projectName.Text.Trim();
+            Model.fileName = txt_fileName.Text.Trim();
             this.Close();
             Cmd_colorPipe.colorevent.Raise();
         }
@@ -91,7 +78,7 @@ namespace CMDtest.ColorPipe
 
         private void btn_delete_Click(object sender, EventArgs e)
         {
-            string path = $@"C:\ProgramData\Autodesk\Revit\Addins\Data\{dgv_allFile.CurrentCell.Value}.txt";
+            string path = $@"{DirPath.ColorPipe}{cb_project.SelectedItem}\{dgv_allFile.CurrentCell.Value}.txt";
             bool result = File.Exists(path);
             if (result == true)
             {
@@ -105,9 +92,29 @@ namespace CMDtest.ColorPipe
             }
         }
 
+        private void loadProject() 
+        {
+            foreach (string dirname in Directory.GetDirectories($@"C:\ProgramData\Autodesk\Revit\Addins\Data\ColorPipe"))
+            {
+                string[] txtName = dirname.Split(new[] { "\\" }, StringSplitOptions.None);
+                string Nametxt = txtName[txtName.Length - 1];
+                cb_project.Items.Add(Nametxt);
+            }
+
+            if (cb_project.Items.Contains(Model.ProjectName))
+            {
+                cb_project.SelectedIndex = cb_project.Items.IndexOf(Model.ProjectName);
+            }
+            else
+                cb_project.SelectedIndex = 0;
+        }
         private void loadFile()
         {
-            foreach (string fname in System.IO.Directory.GetFileSystemEntries(@"C:\ProgramData\Autodesk\Revit\Addins\Data\", "*.txt"))
+            if (!Directory.Exists($@"C:\ProgramData\Autodesk\Revit\Addins\Data\ColorPipe\{Model.ProjectName}"))
+            {
+                Directory.CreateDirectory($@"C:\ProgramData\Autodesk\Revit\Addins\Data\ColorPipe\{Model.ProjectName}");
+            }
+            foreach (string fname in Directory.GetFileSystemEntries($@"C:\ProgramData\Autodesk\Revit\Addins\Data\ColorPipe\{Model.ProjectName}", "*.txt"))
             {
                 string[] txtName = fname.Split(new[] { "\\" }, StringSplitOptions.None);
                 string Nametxt = txtName[txtName.Length - 1];
@@ -122,16 +129,16 @@ namespace CMDtest.ColorPipe
 
         private void stretchBtn_Click(object sender, EventArgs e)
         {
-            if (flowLayoutPanel1.Visible)
+            if (panel1.Visible)
             {
                 stretchBtn.BackgroundImage = imageList1.Images[0];
-                flowLayoutPanel1.Visible = false;
-                this.Width = originalWidth - flowLayoutPanel1.Width;
+                panel1.Visible = false;
+                this.Width = originalWidth - panel1.Width;
             }
             else
             {
                 stretchBtn.BackgroundImage = imageList1.Images[1];
-                flowLayoutPanel1.Visible = true;
+                panel1.Visible = true;
                 this.Width = originalWidth;
             }
         }
@@ -144,17 +151,19 @@ namespace CMDtest.ColorPipe
         private void dgv_allFile_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             dgv_detail.Rows.Clear();
-            var data = ini.read(ini.iniPath, dgv_allFile.SelectedCells[0].Value.ToString() + ".txt");
+            Model.NowEleId = new List<string>();
+            var data = ini.read(DirPath.ColorPipe + cb_project.SelectedItem, dgv_allFile.SelectedCells[0].Value.ToString() + ".txt");
             foreach (var item in data)
             {
                 int index = dgv_detail.Rows.Add();
                 string[] tmp = Regex.Split(item, "<!>", RegexOptions.IgnoreCase);
+                // 當前元素id集合
+                Model.NowEleId.Add(tmp[1]);
                 dgv_detail.Rows[index].Cells[0].Value = tmp[1];
                 dgv_detail.Rows[index].Cells[1].Value = tmp[2];
                 dgv_detail.Rows[index].Cells[2].Value = tmp[3];
-                //dgv_detail.Rows[index].Cells[3].Value = tmp[4];
 
-                dgv_detail.Rows[index].Cells[3].Style.BackColor = Color.FromArgb(Convert.ToInt32(tmp[4].Split(',')[0]), Convert.ToInt32(tmp[4].Split(',')[1]), Convert.ToInt32(tmp[4].Split(',')[2]));
+                dgv_detail.Rows[index].Cells[3].Style.BackColor = System.Drawing.Color.FromArgb(Convert.ToInt32(tmp[4].Split(',')[0]), Convert.ToInt32(tmp[4].Split(',')[1]), Convert.ToInt32(tmp[4].Split(',')[2]));
             }
         }
 
@@ -185,8 +194,6 @@ namespace CMDtest.ColorPipe
                 foreach (DataGridViewRow item in dgv_detail.Rows)
                 {
                     SelectEle selectEle = new SelectEle();
-                    //string[] rgb = item.Cells[3].Value.ToString().Split(',');
-                    //var color = Color.FromArgb(Convert.ToInt32(rgb[0]), Convert.ToInt32(rgb[1]), Convert.ToInt32(rgb[2]));
                     selectEle.Id = item.Cells[0].Value.ToString();
                     selectEle.SysColor = item.Cells[3].Style.BackColor;
                     Model.SelectEleList.Add(selectEle);
@@ -203,7 +210,92 @@ namespace CMDtest.ColorPipe
 
         private void btn_3D_Click(object sender, EventArgs e)
         {
+            Model.NameOf3D = txt_3dname.Text.Trim();
+            Model.templateName = cb_template.Text.Trim();
             Cmd_colorPipe.event_3d.Raise();
+        }
+
+       
+        private void cb_project_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            dgv_allFile.Rows.Clear();
+            foreach (string fname in Directory.GetFileSystemEntries( $@"{DirPath.ColorPipe}{cb_project.SelectedItem}", "*.txt"))
+            {
+                string[] txtName = fname.Split(new[] { "\\" }, StringSplitOptions.None);
+                string Nametxt = txtName[txtName.Length - 1];
+                Nametxt = Nametxt.Replace(".txt", "");
+                dgv_allFile.Rows.Add(Nametxt);
+            }
+            txt_projectName.Text = cb_project.SelectedItem.ToString();
+            if (dgv_allFile.Rows.Count > 0)
+            {
+                dgv_allFile.Rows[0].Selected = false;
+            }
+        }
+
+        public class ZhmTextBox : System.Windows.Forms.TextBox
+        {
+            private const int EM_SETCUEBANNER = 0x1501;
+
+            [DllImport("user32.dll", CharSet = CharSet.Auto)]
+            private static extern Int32 SendMessage(IntPtr hWnd, int msg, int wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
+
+            private string placeholder = string.Empty;
+            public string Placeholder
+            {
+                get { return placeholder; }
+                set
+                {
+                    placeholder = value;
+                    SendMessage(Handle, EM_SETCUEBANNER, 0, Placeholder);
+                }
+            }
+        }
+        
+         public List<string> ApplyViewTemplate()
+         {
+             UIApplication uiapp = Cmd_colorPipe.commandData.Application;
+             UIDocument uidoc = uiapp.ActiveUIDocument;
+             Document doc = uidoc.Document;
+
+             List<string> TemplateName = new List<string>();
+
+             FilteredElementCollector viewFamilyCollector = new FilteredElementCollector(doc);
+             viewFamilyCollector.OfCategory(BuiltInCategory.OST_Views);
+             viewFamilyCollector.OfClass(typeof(View3D));
+             ICollection<ElementId> vID = viewFamilyCollector.ToElementIds();
+
+             foreach (ElementId elementId in vID)
+             {
+                 View view = doc.GetElement(elementId) as View;
+
+                 if (view.IsTemplate == true)
+                 {
+                     TemplateName.Add(view.Name);
+                 }
+             }
+
+             return TemplateName;
+         }
+        public class LocationCheck
+        {
+            public static bool Exist { get; set; } = false;
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void txt_fileName_Click(object sender, EventArgs e)
+        {
+            if (txt_fileName.Text == "Default")
+                txt_fileName.Text = "";
         }
     }
 }

@@ -26,6 +26,7 @@ namespace CMDtest.ColorPipe
         {
             if (Model.Status == "修改色")
             {
+
                 foreach (var item in SelectEleList)
                 {
                     Color color = new Color(item.SysColor.R, item.SysColor.G, item.SysColor.B);
@@ -34,8 +35,10 @@ namespace CMDtest.ColorPipe
                     ElementId elementId = new ElementId(Convert.ToInt32(item.Id));
                     doc.ActiveView.SetElementOverrides(elementId, ogs);
                 }
+
+
             }
-            else if (Model.Status == "全部復原") 
+            else if (Model.Status == "全部復原")
             {
                 List<Element> OtherInstance = new FilteredElementCollector(doc).WherePasses(new ElementClassFilter(typeof(FamilyInstance))).ToList();
                 FilteredElementCollector PipeCollector = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_PipeCurves);
@@ -63,7 +66,7 @@ namespace CMDtest.ColorPipe
                     {
                     }
                 }
-               
+
             }
             else
             {

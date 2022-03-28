@@ -27,7 +27,7 @@ namespace CMDtest.ColorPipe
             LocationCheck.Exist = true;
 
             this.Text = Model.SelectFile;
-            var data = ini.read(ini.iniPath, Model.SelectFile + ".txt");
+            var data = ini.read(DirPath.Data, Model.SelectFile + ".txt");
             foreach (var item in data)
             {
                 int index = dgv_detail.Rows.Add();
